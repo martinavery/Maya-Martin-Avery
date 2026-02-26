@@ -1,7 +1,8 @@
-package com.example.maya_exam_martin_avery.data.local
+package com.example.maya_exam_martin_avery.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import com.example.maya_exam_martin_avery.data.local.entities.UserEntity
 
 // Minimal DAO used to verify Room code generation (KSP).
 @Dao
@@ -26,4 +27,3 @@ interface UserDao {
 """)
     suspend fun fetchUser(username: String, password: String): UserEntity?
 }
-

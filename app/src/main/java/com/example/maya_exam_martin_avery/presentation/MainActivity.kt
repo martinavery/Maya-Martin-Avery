@@ -10,7 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.maya_exam_martin_avery.data.local.UserDao
+import com.example.maya_exam_martin_avery.data.local.dao.UserDao
 import com.example.maya_exam_martin_avery.presentation.login.LoginRoute
 import com.example.maya_exam_martin_avery.presentation.login.LoginScreen
 import com.example.maya_exam_martin_avery.presentation.navigation.AppNavGraph

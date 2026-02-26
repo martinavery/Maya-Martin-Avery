@@ -1,6 +1,6 @@
 package com.example.maya_exam_martin_avery.data.local.repository
 
-import com.example.maya_exam_martin_avery.data.local.UserDao
+import com.example.maya_exam_martin_avery.data.local.dao.UserDao
 import com.example.maya_exam_martin_avery.data.local.mappers.UserMapper
 import com.example.maya_exam_martin_avery.domain.error.InvalidCredentialsException
 import com.example.maya_exam_martin_avery.domain.error.LoginAppException

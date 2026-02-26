@@ -3,7 +3,7 @@ package com.example.maya_exam_martin_avery.di
 import android.content.Context
 import androidx.room.Room
 import com.example.maya_exam_martin_avery.data.local.AppDatabase
-import com.example.maya_exam_martin_avery.data.local.UserDao
+import com.example.maya_exam_martin_avery.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

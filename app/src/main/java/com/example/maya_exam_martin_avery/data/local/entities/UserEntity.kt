@@ -1,4 +1,4 @@
-package com.example.maya_exam_martin_avery.data.local
+package com.example.maya_exam_martin_avery.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,4 +10,3 @@ data class UserEntity(
     val username: String = "",
     val password: String = "" //Plain text for demo purposes only
 )
-
