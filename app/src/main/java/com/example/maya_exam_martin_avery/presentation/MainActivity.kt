@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.maya_exam_martin_avery.data.local.UserDao
+import com.example.maya_exam_martin_avery.presentation.login.LoginRoute
 import com.example.maya_exam_martin_avery.presentation.login.LoginScreen
+import com.example.maya_exam_martin_avery.presentation.navigation.AppNavGraph
 import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAveryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -35,13 +37,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun App() {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        LoginScreen(modifier = Modifier.padding(innerPadding))
-    }
+   AppNavGraph()
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    App()
+    LoginRoute(onLoginSuccess = {})
 }

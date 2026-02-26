@@ -19,9 +19,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel(), // Provided by Hilt via `@HiltViewModel`.
+    uiState: LoginState,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     LoginContent(modifier = modifier, uiState = uiState)
 }
 
