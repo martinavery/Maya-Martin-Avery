@@ -12,7 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.maya_exam_martin_avery.ui.theme.MayaExamMartinAveryTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+// Enables field/constructor injection in this Activity (and in any injected ViewModels used by it).
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
