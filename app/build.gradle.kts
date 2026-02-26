@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -44,10 +44,6 @@ android {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -66,7 +62,13 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    // Hilt codegen via KSP (avoids KAPT instability with Kotlin 2.0+).
+    ksp(libs.hilt.compiler)
+
+    // Room (KSP codegen).
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -75,4 +77,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+ksp {
+    // Export schemas for reproducible builds and migration visibility.
+    arg("room.schemaLocation", "$projectDir/schemas")
+    // Incremental processing speeds up rebuilds.
+    arg("room.incremental", "true")
 }

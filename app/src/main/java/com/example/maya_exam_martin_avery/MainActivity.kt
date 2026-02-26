@@ -11,12 +11,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.maya_exam_martin_avery.data.local.ExampleDao
 import com.example.maya_exam_martin_avery.ui.theme.MayaExamMartinAveryTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 // Enables field/constructor injection in this Activity (and in any injected ViewModels used by it).
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    // Injected to validate that Room/Hilt bindings are correctly wired.
+    @Inject lateinit var exampleDao: ExampleDao
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

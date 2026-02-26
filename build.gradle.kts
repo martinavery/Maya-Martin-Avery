@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt.android) apply false
+    // KSP is used for Room and (optionally) for Hilt codegen.
+    alias(libs.plugins.ksp) apply false
 }
 
 // Keep Kotlin runtime artifacts aligned with the Kotlin Gradle plugin version.
