@@ -3,7 +3,7 @@ package com.example.maya_exam_martin_avery.di
 import android.content.Context
 import androidx.room.Room
 import com.example.maya_exam_martin_avery.data.local.AppDatabase
-import com.example.maya_exam_martin_avery.data.local.ExampleDao
+import com.example.maya_exam_martin_avery.data.local.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,8 +26,8 @@ object DatabaseModule {
             .build()
 
     @Provides
-    fun provideExampleDao(
-        db: AppDatabase,
-    ): ExampleDao = db.exampleDao()
+    fun provideUserDao(db: AppDatabase): UserDao {
+        return db.userDao()
+    }
 }
 

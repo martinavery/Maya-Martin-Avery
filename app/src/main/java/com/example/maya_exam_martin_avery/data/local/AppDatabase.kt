@@ -5,11 +5,11 @@ import androidx.room.RoomDatabase
 
 // Minimal Room database used to verify Room + KSP + Hilt wiring.
 @Database(
-    entities = [ExampleItem::class],
+    entities = [UserEntity::class],
     version = 1,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun exampleDao(): ExampleDao
+    abstract fun userDao(): UserDao
 }
 

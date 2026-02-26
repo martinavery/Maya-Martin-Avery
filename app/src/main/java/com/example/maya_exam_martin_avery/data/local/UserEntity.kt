@@ -4,9 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 // Minimal Room entity used to verify Room + KSP + Hilt wiring.
-@Entity(tableName = "example_items")
-data class ExampleItem(
+@Entity(tableName = "users")
+data class UserEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
+    val username: String = "",
+    val password: String = "" //Plain text for demo purposes only
 )
 
