@@ -1,4 +1,4 @@
-package com.example.maya_exam_martin_avery.ui.theme
+package com.example.maya_exam_martin_avery.presentation.theme
 
 import android.app.Activity
 import android.os.Build

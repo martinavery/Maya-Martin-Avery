@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -52,11 +55,43 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    // Needed for `Icons.Filled.Visibility` / `VisibilityOff`.
+    implementation(libs.androidx.material.icons.extended)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
+
+    implementation(libs.hilt.android)
+    // Compose integration for `hiltViewModel()`.
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    // Required for type-safe Navigation Compose routes (`composable<Login> { ... }`).
+    implementation(libs.kotlinx.serialization.json)
+    // Hilt codegen via KSP (avoids KAPT instability with Kotlin 2.0+).
+    ksp(libs.hilt.compiler)
+
+    // Room (KSP codegen).
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+ksp {
+    // Export schemas for reproducible builds and migration visibility.
+    arg("room.schemaLocation", "$projectDir/schemas")
+    // Incremental processing speeds up rebuilds.
+    arg("room.incremental", "true")
 }
