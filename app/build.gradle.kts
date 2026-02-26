@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
 }
@@ -54,6 +55,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    // Needed for `Icons.Filled.Visibility` / `VisibilityOff`.
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
@@ -62,6 +65,11 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.hilt.android)
+    // Compose integration for `hiltViewModel()`.
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    // Required for type-safe Navigation Compose routes (`composable<Login> { ... }`).
+    implementation(libs.kotlinx.serialization.json)
     // Hilt codegen via KSP (avoids KAPT instability with Kotlin 2.0+).
     ksp(libs.hilt.compiler)
 
