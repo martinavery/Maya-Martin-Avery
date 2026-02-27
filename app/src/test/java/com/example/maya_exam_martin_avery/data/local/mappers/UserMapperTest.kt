@@ -1,6 +1,6 @@
 package com.example.maya_exam_martin_avery.data.local.mappers
 
-import com.example.maya_exam_martin_avery.data.local.UserEntity
+import com.example.maya_exam_martin_avery.data.local.entities.UserEntity
 import com.example.maya_exam_martin_avery.domain.model.UserDomain
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -15,7 +15,7 @@ class UserMapperTest {
 
         val domain = mapper.toDomain(entity)
 
-        assertEquals(UserDomain(userName = "maya"), domain)
+        assertEquals(UserDomain(userName = "maya", userId = entity.id), domain)
     }
 }
 

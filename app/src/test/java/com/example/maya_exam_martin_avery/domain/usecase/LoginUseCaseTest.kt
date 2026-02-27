@@ -19,7 +19,7 @@ class LoginUseCaseTest {
     @Test
     fun `invoke delegates to repository and returns success`() = runTest {
         // Use case should be a simple pass-through to the repository.
-        val expected = UserDomain(userName = "maya")
+        val expected = UserDomain(userName = "maya", userId = 1L)
         val username = "maya"
         val password = "pw"
 

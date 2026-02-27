@@ -14,7 +14,9 @@ fun LoginRoute(onLoginSuccess: () -> Unit, viewModel: LoginViewModel = hiltViewM
         // One-off navigation on successful login (avoids re-triggering on recomposition).
         viewModel.effects.collectLatest { effect ->
             when (effect) {
-                LoginEffect.NavigateToNext -> onLoginSuccess()
+                is LoginEffect.NavigateToNext -> {
+                    onLoginSuccess()
+                }
             }
         }
     }

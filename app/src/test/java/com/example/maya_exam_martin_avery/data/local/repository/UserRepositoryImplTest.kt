@@ -1,8 +1,10 @@
 package com.example.maya_exam_martin_avery.data.local.repository
 
-import com.example.maya_exam_martin_avery.data.local.UserDao
-import com.example.maya_exam_martin_avery.data.local.UserEntity
+import com.example.maya_exam_martin_avery.data.local.dao.UserDao
+import com.example.maya_exam_martin_avery.data.local.dao.WalletDao
+import com.example.maya_exam_martin_avery.data.local.entities.UserEntity
 import com.example.maya_exam_martin_avery.data.local.mappers.UserMapper
+import com.example.maya_exam_martin_avery.data.local.preferences.CurrentUserPreferences
 import com.example.maya_exam_martin_avery.domain.error.InvalidCredentialsException
 import com.example.maya_exam_martin_avery.domain.error.LoginAppException
 import com.example.maya_exam_martin_avery.domain.model.UserDomain
@@ -20,9 +22,16 @@ import org.junit.Test
 
 class UserRepositoryImplTest {
     private val userDao: UserDao = mockk()
+    private val walletDao: WalletDao = mockk()
     private val userMapper: UserMapper = mockk()
+    private val currentUserPreferences: CurrentUserPreferences = mockk()
 
-    private val repository = UserRepositoryImpl(userDao = userDao, userMapper = userMapper)
+    private val repository = UserRepositoryImpl(
+        userDao = userDao,
+        walletDao = walletDao,
+        userMapper = userMapper,
+        currentUserPreferences = currentUserPreferences,
+    )
 
     @Test
     fun `fetchUser returns failure when dao returns null`() = runTest {
@@ -39,7 +48,8 @@ class UserRepositoryImplTest {
 
         coVerify(exactly = 1) { userDao.fetchUser(username, password) }
         verify(exactly = 0) { userMapper.toDomain(any()) }
-        confirmVerified(userDao, userMapper)
+        verify(exactly = 0) { currentUserPreferences.saveCurrentUserId(any()) }
+        confirmVerified(userDao, userMapper, currentUserPreferences)
     }
 
     @Test
@@ -60,7 +70,8 @@ class UserRepositoryImplTest {
 
         coVerify(exactly = 1) { userDao.fetchUser(username, password) }
         verify(exactly = 0) { userMapper.toDomain(any()) }
-        confirmVerified(userDao, userMapper)
+        verify(exactly = 0) { currentUserPreferences.saveCurrentUserId(any()) }
+        confirmVerified(userDao, userMapper, currentUserPreferences)
     }
 
     @Test
@@ -69,9 +80,10 @@ class UserRepositoryImplTest {
         val username = "maya"
         val password = "pw"
         val entity = UserEntity(id = 123L, username = username, password = password)
-        val expected = UserDomain(userName = username)
+        val expected = UserDomain(userName = username, userId = entity.id)
 
         coEvery { userDao.fetchUser(username, password) } returns entity
+        every { currentUserPreferences.saveCurrentUserId(entity.id) } returns Unit
         // Mapper is synchronous (non-suspend).
         every { userMapper.toDomain(entity) } returns expected
 
@@ -81,8 +93,32 @@ class UserRepositoryImplTest {
         assertEquals(expected, result.getOrThrow())
 
         coVerify(exactly = 1) { userDao.fetchUser(username, password) }
+        verify(exactly = 1) { currentUserPreferences.saveCurrentUserId(entity.id) }
         verify(exactly = 1) { userMapper.toDomain(entity) }
-        confirmVerified(userDao, userMapper)
+        confirmVerified(userDao, userMapper, currentUserPreferences)
+    }
+
+    @Test
+    fun `fetchUser returns app error when saving current user id fails`() = runTest {
+        val username = "maya"
+        val password = "pw"
+        val entity = UserEntity(id = 123L, username = username, password = password)
+        val cause = IllegalStateException("prefs failed")
+
+        coEvery { userDao.fetchUser(username, password) } returns entity
+        every { currentUserPreferences.saveCurrentUserId(entity.id) } throws cause
+
+        val result = repository.fetchUser(username, password)
+
+        assertTrue(result.isFailure)
+        val error = result.exceptionOrNull()
+        assertTrue(error is LoginAppException)
+        assertSame(cause, error?.cause)
+
+        coVerify(exactly = 1) { userDao.fetchUser(username, password) }
+        verify(exactly = 1) { currentUserPreferences.saveCurrentUserId(entity.id) }
+        verify(exactly = 0) { userMapper.toDomain(any()) }
+        confirmVerified(userDao, userMapper, currentUserPreferences)
     }
 
     @Test
@@ -91,12 +127,18 @@ class UserRepositoryImplTest {
         val username = "admin"
         val password = "admin"
         coEvery { userDao.insertDefaultIfEmpty(username = username, password = password) } returns Unit
+        coEvery { userDao.fetchUser(username = username, password = password) } returns
+            UserEntity(id = 123L, username = username, password = password)
+        coEvery { walletDao.insertWalletIfMissing(userId = 123L, pesoBalance = 1000.0) } returns Unit
 
         val result = repository.seedDefaultUserIfEmpty(username = username, password = password)
 
         assertTrue(result.isSuccess)
         coVerify(exactly = 1) { userDao.insertDefaultIfEmpty(username = username, password = password) }
-        confirmVerified(userDao, userMapper)
+        coVerify(exactly = 1) { userDao.fetchUser(username = username, password = password) }
+        coVerify(exactly = 1) { walletDao.insertWalletIfMissing(userId = 123L, pesoBalance = 1000.0) }
+        verify(exactly = 0) { currentUserPreferences.saveCurrentUserId(any()) }
+        confirmVerified(userDao, walletDao, userMapper, currentUserPreferences)
     }
 
     @Test
@@ -112,7 +154,9 @@ class UserRepositoryImplTest {
         assertTrue(result.isFailure)
         assertSame(expectedError, result.exceptionOrNull())
         coVerify(exactly = 1) { userDao.insertDefaultIfEmpty(username = username, password = password) }
-        confirmVerified(userDao, userMapper)
+        coVerify(exactly = 0) { userDao.fetchUser(any(), any()) }
+        coVerify(exactly = 0) { walletDao.insertWalletIfMissing(any(), any()) }
+        verify(exactly = 0) { currentUserPreferences.saveCurrentUserId(any()) }
+        confirmVerified(userDao, walletDao, userMapper, currentUserPreferences)
     }
 }
-
