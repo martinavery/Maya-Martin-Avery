@@ -2,9 +2,7 @@ package com.example.maya_exam_martin_avery.presentation.my_wallet
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -12,7 +10,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAveryTheme
 
 @Composable
-fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked: () -> Unit) {
+fun WalletRoute(
+    viewModel: WalletViewModel = hiltViewModel(),
+    onSendMoneyClicked: () -> Unit,
+    onViewTransactionsClicked: () -> Unit,
+) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel) {
@@ -22,7 +24,10 @@ fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked
 
     WalletScreen(
         state = state.value,
+        // Edge-to-edge is enabled; keep content out of system bars.
+        modifier = Modifier.safeDrawingPadding(),
         onSendMoneyClicked = onSendMoneyClicked,
+        onViewTransactionsClicked = onViewTransactionsClicked,
         onToggleBalanceVisibility = viewModel::onToggleBalanceVisibility
     )
 }
@@ -31,13 +36,12 @@ fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked
 @Preview(showSystemUi = true)
 fun WalletRoutePreview() {
     MayaExamMartinAveryTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            WalletScreen(
-                state = WalletState(),
-                modifier = Modifier.padding(innerPadding),
-                onSendMoneyClicked = {},
-                onToggleBalanceVisibility = {}
-            )
-        }
+        WalletScreen(
+            state = WalletState(),
+            modifier = Modifier.safeDrawingPadding(),
+            onSendMoneyClicked = {},
+            onViewTransactionsClicked = {},
+            onToggleBalanceVisibility = {}
+        )
     }
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.maya_exam_martin_avery.domain.usecase.GetCurrentUserIdUseCase
 import com.example.maya_exam_martin_avery.domain.usecase.GetWalletByUserIdUseCase
+import com.example.maya_exam_martin_avery.domain.usecase.PostTransactionUseCase
+import com.example.maya_exam_martin_avery.domain.usecase.SaveLocalTransactionUseCase
 import com.example.maya_exam_martin_avery.domain.usecase.SendMoneyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +25,8 @@ class SendMoneyViewModel @Inject constructor(
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val getWalletByUserIdUseCase: GetWalletByUserIdUseCase,
     private val sendMoneyUseCase: SendMoneyUseCase,
+    private val saveLocalTransactionUseCase: SaveLocalTransactionUseCase,
+    private val postTransactionUseCase: PostTransactionUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SendMoneyState())
     val uiState: StateFlow<SendMoneyState> = _uiState
@@ -76,6 +80,24 @@ class SendMoneyViewModel @Inject constructor(
 
             val result = sendMoneyUseCase.invoke(userId = userId, amount = amount)
             result.onSuccess {
+                val description = "Sent ₱%.2f".format(amount)
+                val now = System.currentTimeMillis()
+
+                // Local history is the source of truth because JSONPlaceholder does not retain writes.
+                saveLocalTransactionUseCase.invoke(
+                    userId = userId,
+                    amount = amount,
+                    description = description,
+                    createdAtEpochMs = now,
+                )
+
+                // Best-effort POST to satisfy \"must use API\" requirement; do not block success UX on failure.
+                postTransactionUseCase.invoke(
+                    userId = userId,
+                    amount = amount,
+                    description = description,
+                )
+
                 // Show success sheet; navigation happens on Done.
                 _uiState.update { it.copy(isLoading = false, sheet = SendMoneySheetState.Success(sentAmount = amount)) }
             }.onFailure { t ->

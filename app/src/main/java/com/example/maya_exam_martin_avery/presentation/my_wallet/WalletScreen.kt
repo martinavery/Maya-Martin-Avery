@@ -33,6 +33,7 @@ fun WalletScreen(
     state: WalletState,
     modifier: Modifier = Modifier,
     onSendMoneyClicked: () -> Unit,
+    onViewTransactionsClicked: () -> Unit,
     onToggleBalanceVisibility: () -> Unit
 ) {
     val buttonStyling = Modifier
@@ -54,7 +55,7 @@ fun WalletScreen(
             onSendMoneyClicked = onSendMoneyClicked
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ViewTransactionsButton(modifier = buttonStyling, onViewTransacClicked = {})
+        ViewTransactionsButton(modifier = buttonStyling, onViewTransacClicked = onViewTransactionsClicked)
     }
 }
 
@@ -65,10 +66,11 @@ fun AvailableBalanceCard(
     isBalanceVisible: Boolean = true,
     onToggleBalanceVisibility: () -> Unit = {}
 ) {
-    val formattedBalance = formatBalance(balance)
+    val formattedBalance = rememberFormattedBalance(balance)
     val displayBalance = if (isBalanceVisible) {
         formattedBalance
     } else {
+        // Mask digits but preserve separators (e.g., 100.25 -> ***.**).
         formattedBalance.maskDigits()
     }
 
@@ -103,7 +105,8 @@ fun AvailableBalanceCard(
     }
 }
 
-private fun formatBalance(balance: Double): String {
+@Composable
+private fun rememberFormattedBalance(balance: Double): String {
     // Use a stable 2-decimal representation so the mask stays consistent (e.g., 9 -> 9.00 -> *.**).
     return String.format(Locale.US, "%.2f", balance)
 }
@@ -137,7 +140,8 @@ fun WalletPreview() {
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),
                 onSendMoneyClicked = {},
-                onToggleBalanceVisibility = {}
+                onToggleBalanceVisibility = {},
+                onViewTransactionsClicked = {}
             )
         }
     }

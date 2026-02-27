@@ -9,11 +9,6 @@ import javax.inject.Singleton
 class SendMoneyUseCase @Inject constructor(
     private val walletRepository: WalletRepository,
 ) {
-    /**
-     * Sends money by deducting [amount] from the current wallet balance and persisting it.
-     *
-     * Returns the new persisted balance on success.
-     */
     suspend operator fun invoke(userId: Long, amount: Double): Result<Double> {
         if (amount <= 0.0) {
             // Validation lives in the domain layer so presentation stays thin.
