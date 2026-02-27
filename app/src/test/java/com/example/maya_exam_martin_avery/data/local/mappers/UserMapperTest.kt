@@ -15,7 +15,7 @@ class UserMapperTest {
 
         val domain = mapper.toDomain(entity)
 
-        assertEquals(UserDomain(userName = "maya"), domain)
+        assertEquals(UserDomain(userName = "maya", userId = entity.id), domain)
     }
 }
 
