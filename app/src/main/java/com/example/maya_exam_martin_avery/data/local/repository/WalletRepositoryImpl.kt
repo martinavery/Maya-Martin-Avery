@@ -25,5 +25,18 @@ class WalletRepositoryImpl @Inject constructor(
             Result.failure(WalletAppException(t))
         }
     }
+
+    override suspend fun updateWalletBalance(userId: Long, newBalance: Double): Result<Unit> {
+        return try {
+            val updatedRows = walletDao.updateWalletBalance(userId = userId, newBalance = newBalance)
+            if (updatedRows == 0) {
+                Result.failure(WalletNotFoundException(userId))
+            } else {
+                Result.success(Unit)
+            }
+        } catch (t: Throwable) {
+            Result.failure(WalletAppException(t))
+        }
+    }
 }
 

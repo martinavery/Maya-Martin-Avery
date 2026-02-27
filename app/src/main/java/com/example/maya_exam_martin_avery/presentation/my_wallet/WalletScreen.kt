@@ -9,16 +9,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,33 +37,72 @@ import androidx.compose.ui.unit.sp
 import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAveryTheme
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletScreen(
     state: WalletState,
     modifier: Modifier = Modifier,
     onSendMoneyClicked: () -> Unit,
-    onToggleBalanceVisibility: () -> Unit
+    onViewTransactionsClicked: () -> Unit,
+    onToggleBalanceVisibility: () -> Unit,
+    onLogoutClicked: () -> Unit,
 ) {
     val buttonStyling = Modifier
         .fillMaxWidth()
         .height(48.dp)
         .padding(horizontal = 16.dp)
 
-    Column(modifier = modifier.fillMaxSize()) {
-        AvailableBalanceCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            balance = state.balance,
-            isBalanceVisible = state.isBalanceVisible,
-            onToggleBalanceVisibility = onToggleBalanceVisibility
-        )
-        SendMoneyButton(
-            modifier = buttonStyling,
-            onSendMoneyClicked = onSendMoneyClicked
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        ViewTransactionsButton(modifier = buttonStyling, onViewTransacClicked = {})
+    var isMenuExpanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Wallet") },
+                actions = {
+                    // Menu toolbar: keep logout behind the overflow menu.
+                    IconButton(onClick = { isMenuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = "Menu",
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isMenuExpanded,
+                        onDismissRequest = { isMenuExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                isMenuExpanded = false
+                                onLogoutClicked()
+                            },
+                        )
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            AvailableBalanceCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                balance = state.balance,
+                isBalanceVisible = state.isBalanceVisible,
+                onToggleBalanceVisibility = onToggleBalanceVisibility
+            )
+            SendMoneyButton(
+                modifier = buttonStyling,
+                onSendMoneyClicked = onSendMoneyClicked
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            ViewTransactionsButton(modifier = buttonStyling, onViewTransacClicked = onViewTransactionsClicked)
+        }
     }
 }
 
@@ -65,10 +113,11 @@ fun AvailableBalanceCard(
     isBalanceVisible: Boolean = true,
     onToggleBalanceVisibility: () -> Unit = {}
 ) {
-    val formattedBalance = formatBalance(balance)
+    val formattedBalance = rememberFormattedBalance(balance)
     val displayBalance = if (isBalanceVisible) {
         formattedBalance
     } else {
+        // Mask digits but preserve separators (e.g., 100.25 -> ***.**).
         formattedBalance.maskDigits()
     }
 
@@ -103,7 +152,8 @@ fun AvailableBalanceCard(
     }
 }
 
-private fun formatBalance(balance: Double): String {
+@Composable
+private fun rememberFormattedBalance(balance: Double): String {
     // Use a stable 2-decimal representation so the mask stays consistent (e.g., 9 -> 9.00 -> *.**).
     return String.format(Locale.US, "%.2f", balance)
 }
@@ -137,7 +187,9 @@ fun WalletPreview() {
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),
                 onSendMoneyClicked = {},
-                onToggleBalanceVisibility = {}
+                onToggleBalanceVisibility = {},
+                onViewTransactionsClicked = {},
+                onLogoutClicked = {},
             )
         }
     }

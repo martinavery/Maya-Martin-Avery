@@ -3,6 +3,7 @@ package com.example.maya_exam_martin_avery.di
 import android.content.Context
 import androidx.room.Room
 import com.example.maya_exam_martin_avery.data.local.AppDatabase
+import com.example.maya_exam_martin_avery.data.local.dao.TransactionDao
 import com.example.maya_exam_martin_avery.data.local.dao.UserDao
 import com.example.maya_exam_martin_avery.data.local.dao.WalletDao
 import dagger.Module
@@ -34,6 +35,11 @@ object DatabaseModule {
     @Provides
     fun provideWalletDao(db: AppDatabase): WalletDao {
         return db.walletDao()
+    }
+
+    @Provides
+    fun provideTransactionDao(db: AppDatabase): TransactionDao {
+        return db.transactionDao()
     }
 }
 
