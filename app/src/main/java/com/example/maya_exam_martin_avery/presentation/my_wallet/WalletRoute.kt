@@ -21,7 +21,6 @@ fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked
 fun WalletRoutePreview() {
     MayaExamMartinAveryTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            // Preview uses the same insets behavior as the real app.
             WalletScreen(
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),

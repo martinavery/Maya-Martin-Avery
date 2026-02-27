@@ -41,7 +41,8 @@ fun WalletScreen(
         AvailableBalanceCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            balance = state.balance
         )
         SendMoneyButton(
             modifier = buttonStyling,
@@ -98,7 +99,6 @@ fun ViewTransactionsButton(modifier: Modifier = Modifier, onViewTransacClicked: 
 fun WalletPreview() {
     MayaExamMartinAveryTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            // Use Scaffold padding in preview to avoid drawing under the status bar.
             WalletScreen(
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),

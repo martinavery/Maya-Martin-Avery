@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.maya_exam_martin_avery.domain.error.InvalidCredentialsException
 import com.example.maya_exam_martin_avery.domain.error.LoginAppException
 import com.example.maya_exam_martin_avery.domain.usecase.LoginUseCase
+import com.example.maya_exam_martin_avery.domain.usecase.SaveCurrentUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,26 +22,23 @@ sealed interface LoginEffect {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val saveCurrentUserIdUseCase: SaveCurrentUserIdUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<LoginState>(LoginState())
     val uiState: StateFlow<LoginState> = _uiState
 
-    private val _effects = MutableSharedFlow<LoginEffect>()
+    private val _effects = MutableSharedFlow<LoginEffect>(extraBufferCapacity = 1)
     val effects = _effects.asSharedFlow()
 
     fun setUsername(userName: String) {
         _uiState.update { currentState ->
-            currentState
-                .copy(userName = userName)
-                .withDerivedUi()
+            currentState.copy(userName = userName).withDerivedUi()
         }
     }
 
     fun setPassword(password: String) {
         _uiState.update { currentState ->
-            currentState
-                .copy(password = password)
-                .withDerivedUi()
+            currentState.copy(password = password).withDerivedUi()
         }
     }
 
@@ -53,13 +51,13 @@ class LoginViewModel @Inject constructor(
 
         if (userName.isBlank() || password.isBlank()) {
             _uiState.update {
-                it.copy(screenErrorMessage = "Username and password are required.")
-                    .withDerivedUi()
+                it.copy(screenErrorMessage = "Username and password are required.").withDerivedUi()
             }
             return
         }
 
         viewModelScope.launch {
+
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -69,24 +67,23 @@ class LoginViewModel @Inject constructor(
 
             val result = loginUseCase.invoke(userName = userName, password = password)
 
-            result
-                .onSuccess {
-                    _uiState.update { it.copy(isLoading = false).withDerivedUi() }
-                    _effects.tryEmit(LoginEffect.NavigateToNext)
+            result.onSuccess {
+                saveCurrentUserIdUseCase.invoke(it.userId)
+                _uiState.update { it.copy(isLoading = false).withDerivedUi() }
+                _effects.emit(LoginEffect.NavigateToNext)
+            }.onFailure { t ->
+                val message = when (t) {
+                    is InvalidCredentialsException -> "Invalid username or password."
+                    is LoginAppException -> "Login failed. Please try again."
+                    else -> t.message ?: "Login failed."
                 }
-                .onFailure { t ->
-                    val message = when (t) {
-                        is InvalidCredentialsException -> "Invalid username or password."
-                        is LoginAppException -> "Login failed. Please try again."
-                        else -> t.message ?: "Login failed."
-                    }
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            screenErrorMessage = message,
-                        ).withDerivedUi()
-                    }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        screenErrorMessage = message,
+                    ).withDerivedUi()
                 }
+            }
         }
     }
 
@@ -94,5 +91,9 @@ class LoginViewModel @Inject constructor(
         // Button is disabled while loading or when required inputs are empty.
         val disabled = isLoading || userName.isBlank() || password.isBlank()
         return copy(isButtonDisabled = disabled)
+    }
+
+    fun saveCurrentUserId(userId: Long) {
+        saveCurrentUserIdUseCase.invoke(userId)
     }
 }
