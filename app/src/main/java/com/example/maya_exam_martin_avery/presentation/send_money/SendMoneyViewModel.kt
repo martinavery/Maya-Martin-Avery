@@ -153,8 +153,12 @@ class SendMoneyViewModel @Inject constructor(
         val trimmed = raw.trim()
         if (trimmed.isEmpty()) return ""
 
+        // Allow a single leading '-' so negative values validate correctly (e.g., show "greater than 0").
+        val isNegative = trimmed.startsWith('-')
+        val unsigned = trimmed.removePrefix("-")
+
         // Allow only digits and a single '.', with at most 2 decimals.
-        val normalized = if (trimmed.startsWith('.')) "0$trimmed" else trimmed
+        val normalized = if (unsigned.startsWith('.')) "0$unsigned" else unsigned
 
         val sb = StringBuilder(normalized.length)
         var dotSeen = false
@@ -180,7 +184,8 @@ class SendMoneyViewModel @Inject constructor(
             }
         }
 
-        return sb.toString()
+        val amount = sb.toString()
+        return if (isNegative && amount.isNotEmpty()) "-$amount" else amount
     }
 }
 
