@@ -59,6 +59,13 @@ fun AppNavGraph() {
                         launchSingleTop = true
                     }
                 },
+                onLogout = {
+                    // Logout: return to Login and clear Wallet from the back stack.
+                    navController.navigate(Login) {
+                        popUpTo(Wallet) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         composable<SendMoney> {

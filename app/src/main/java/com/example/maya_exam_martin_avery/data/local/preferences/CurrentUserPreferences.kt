@@ -6,4 +6,7 @@ interface CurrentUserPreferences {
     fun getCurrentUserId(): Long?
 
     fun clearCurrentUserId()
+
+    // Logout behavior: wipe all stored preferences in the app's preferences file.
+    fun clearAll()
 }

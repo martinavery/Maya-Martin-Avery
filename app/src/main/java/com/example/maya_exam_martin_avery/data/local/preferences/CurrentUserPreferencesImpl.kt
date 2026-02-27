@@ -24,6 +24,11 @@ class CurrentUserPreferencesImpl @Inject constructor(
         sharedPreferences.edit { remove(KEY_CURRENT_USER_ID) }
     }
 
+    override fun clearAll() {
+        // Logout behavior: remove *everything* from the preferences file (maya_preferences).
+        sharedPreferences.edit { clear() }
+    }
+
     private companion object {
         const val KEY_CURRENT_USER_ID = "current_user_id"
         const val DEFAULT_MISSING_USER_ID = -1L
