@@ -13,7 +13,11 @@ import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAvery
 @Composable
 fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked: () -> Unit) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
-    WalletScreen(state.value, onSendMoneyClicked = {})
+    WalletScreen(
+        state = state.value,
+        onSendMoneyClicked = onSendMoneyClicked,
+        onToggleBalanceVisibility = viewModel::onToggleBalanceVisibility
+    )
 }
 
 @Composable
@@ -24,7 +28,8 @@ fun WalletRoutePreview() {
             WalletScreen(
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),
-                onSendMoneyClicked = {}
+                onSendMoneyClicked = {},
+                onToggleBalanceVisibility = {}
             )
         }
     }

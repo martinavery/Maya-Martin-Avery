@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,12 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAveryTheme
+import java.util.Locale
 
 @Composable
 fun WalletScreen(
     state: WalletState,
     modifier: Modifier = Modifier,
-    onSendMoneyClicked: () -> Unit
+    onSendMoneyClicked: () -> Unit,
+    onToggleBalanceVisibility: () -> Unit
 ) {
     val buttonStyling = Modifier
         .fillMaxWidth()
@@ -42,7 +45,9 @@ fun WalletScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            balance = state.balance
+            balance = state.balance,
+            isBalanceVisible = state.isBalanceVisible,
+            onToggleBalanceVisibility = onToggleBalanceVisibility
         )
         SendMoneyButton(
             modifier = buttonStyling,
@@ -54,7 +59,19 @@ fun WalletScreen(
 }
 
 @Composable
-fun AvailableBalanceCard(modifier: Modifier = Modifier, balance: Double = 0.0) {
+fun AvailableBalanceCard(
+    modifier: Modifier = Modifier,
+    balance: Double = 0.0,
+    isBalanceVisible: Boolean = true,
+    onToggleBalanceVisibility: () -> Unit = {}
+) {
+    val formattedBalance = formatBalance(balance)
+    val displayBalance = if (isBalanceVisible) {
+        formattedBalance
+    } else {
+        formattedBalance.maskDigits()
+    }
+
     Card(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -64,19 +81,36 @@ fun AvailableBalanceCard(modifier: Modifier = Modifier, balance: Double = 0.0) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Available Balance")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(balance.toString(), fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text(displayBalance, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.width(16.dp))
             IconButton(
                 modifier = Modifier
                     .width(16.dp)
-                    .height(16.dp), onClick = {}) {
+                    .height(16.dp),
+                onClick = onToggleBalanceVisibility
+            ) {
                 Icon(
-                    imageVector = Icons.Filled.VisibilityOff,
-                    contentDescription = "Toggle for balance"
+                    imageVector = if (isBalanceVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                    contentDescription = if (isBalanceVisible) {
+                        "Hide balance"
+                    } else {
+                        "Show balance"
+                    }
                 )
             }
         }
+    }
+}
+
+private fun formatBalance(balance: Double): String {
+    // Use a stable 2-decimal representation so the mask stays consistent (e.g., 9 -> 9.00 -> *.**).
+    return String.format(Locale.US, "%.2f", balance)
+}
+
+private fun String.maskDigits(): String = buildString(length) {
+    for (char in this@maskDigits) {
+        append(if (char.isDigit()) '*' else char)
     }
 }
 
@@ -102,7 +136,8 @@ fun WalletPreview() {
             WalletScreen(
                 state = WalletState(),
                 modifier = Modifier.padding(innerPadding),
-                onSendMoneyClicked = {}
+                onSendMoneyClicked = {},
+                onToggleBalanceVisibility = {}
             )
         }
     }

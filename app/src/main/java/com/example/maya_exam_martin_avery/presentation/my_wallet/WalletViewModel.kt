@@ -25,10 +25,16 @@ class WalletViewModel @Inject constructor(
         loadWallet()
     }
 
+    fun onToggleBalanceVisibility() {
+        // Keep this in ViewModel state so it survives recomposition/config changes.
+        _uiState.update { current ->
+            current.copy(isBalanceVisible = !current.isBalanceVisible)
+        }
+    }
+
     private fun loadWallet() {
         val currentUserId = getCurrentUserIdUseCase.invoke()
         if (currentUserId == null) {
-            // Wallet requires a logged-in user; this prevents a crash if the screen is reached without one.
             _uiState.update { it.copy(errorMessage = "No current user found. Please log in.") }
             return
         }
