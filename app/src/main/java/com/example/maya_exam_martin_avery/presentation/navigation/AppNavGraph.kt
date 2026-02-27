@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.maya_exam_martin_avery.presentation.login.LoginRoute
 import com.example.maya_exam_martin_avery.presentation.my_wallet.WalletRoute
+import com.example.maya_exam_martin_avery.presentation.send_money.SendMoneyRoute
 import com.example.maya_exam_martin_avery.presentation.start.StartRoute
 
 @Composable
@@ -52,8 +53,16 @@ fun AppNavGraph() {
             }
             composable<Wallet> {
                 WalletRoute(onSendMoneyClicked = {
-
+                    navController.navigate(SendMoney) {
+                        launchSingleTop = true
+                    }
                 })
+            }
+            composable<SendMoney> {
+                SendMoneyRoute(
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.popBackStack() },
+                )
             }
         }
     }

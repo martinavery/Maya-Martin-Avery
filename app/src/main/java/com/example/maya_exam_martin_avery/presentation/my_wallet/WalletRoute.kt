@@ -1,6 +1,7 @@
 package com.example.maya_exam_martin_avery.presentation.my_wallet
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -13,6 +14,12 @@ import com.example.maya_exam_martin_avery.presentation.theme.MayaExamMartinAvery
 @Composable
 fun WalletRoute(viewModel: WalletViewModel = hiltViewModel(), onSendMoneyClicked: () -> Unit) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        // When returning to Wallet via back stack, re-entering composition triggers a refresh.
+        viewModel.refreshWallet()
+    }
+
     WalletScreen(
         state = state.value,
         onSendMoneyClicked = onSendMoneyClicked,

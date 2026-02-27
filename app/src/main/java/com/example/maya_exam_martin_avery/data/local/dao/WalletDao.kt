@@ -25,5 +25,15 @@ interface WalletDao {
         """
     )
     suspend fun getWalletByUserId(userId: Long): WalletEntity?
+
+    // Returns number of rows affected; 0 means no wallet exists for userId.
+    @Query(
+        """
+        UPDATE wallets
+        SET balance = :newBalance
+        WHERE userId = :userId
+        """
+    )
+    suspend fun updateWalletBalance(userId: Long, newBalance: Double): Int
 }
 

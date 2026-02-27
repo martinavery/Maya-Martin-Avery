@@ -25,6 +25,11 @@ class WalletViewModel @Inject constructor(
         loadWallet()
     }
 
+    fun refreshWallet() {
+        // Allows the UI to explicitly refresh after returning from a screen that mutates balance (e.g., Send Money).
+        loadWallet()
+    }
+
     fun onToggleBalanceVisibility() {
         // Keep this in ViewModel state so it survives recomposition/config changes.
         _uiState.update { current ->
