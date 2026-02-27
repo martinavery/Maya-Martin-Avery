@@ -33,6 +33,13 @@ Android app built with Kotlin + Jetpack Compose.
 .\gradlew.bat :app:installDebug
 ```
 
+## Default credentials
+
+The app seeds a default user on first run:
+
+- **Username**: `admin`
+- **Password**: `admin`
+
 ## Run local unit tests
 
 Local unit tests live under `app/src/test/` and run on the JVM (no emulator/device required).
